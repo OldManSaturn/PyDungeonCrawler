@@ -18,7 +18,7 @@ PyDungeonCrawler is a Python-based text-based game where players navigate throug
 1. Clone the repository:
 
     ```shell
-    git clone https://github.com/your-username/PyDungeonCrawler.git
+    git clone https://github.com/oldmansaturn/PyDungeonCrawler.git
     ```
 
 2. Install the required dependencies:
