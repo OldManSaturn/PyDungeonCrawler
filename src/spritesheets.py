@@ -36,3 +36,7 @@ class Animation:
             if self.frame_index >= len(self.animation_list):
                 self.frame_index = 0
         return self.animation_list[self.frame_index]
+
+    def reset(self):
+        self.frame_index = 0
+        self.last_update = pygame.time.get_ticks()
