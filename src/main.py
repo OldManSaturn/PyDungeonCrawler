@@ -1,6 +1,5 @@
 import pygame
-from player import Player
-import spritesheets
+from spritesheets import SpriteSheet, Animation
 
 pygame.init()
 
@@ -16,36 +15,16 @@ pygame.display.set_caption("Dalton's Dungeon Crawling")
 clock = pygame.time.Clock()
 FPS = 60
 
-# Idle fighter sprite
+# Load spritesheets
 fighter_idle_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_idle.png").convert_alpha()
-fighter_idle_sprite_sheet = spritesheets.Spritesheet(fighter_idle_spritesheet_file_loaded)
-# Walking fighter sprite
 fighter_walk_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_walk.png").convert_alpha()
-fighter_walk_sprite_sheet = spritesheets.Spritesheet(fighter_walk_spritesheet_file_loaded)
 
-# Create animation list for fighter sprite at idle
-fighter_idle_animation_list = []
-fighter_idle_animation_steps = 5
-# Create animation list for fighter at walking
-fighter_walk_animation_list = []
-fighter_walk_animation_steps = 8
+fighter_idle_sprite_sheet = SpriteSheet(fighter_idle_spritesheet_file_loaded)
+fighter_walk_sprite_sheet = SpriteSheet(fighter_walk_spritesheet_file_loaded)
 
-# Idle animation variables
-fighter_idle_animation_cooldown = 100
-fighter_idle_animation_frame = 0
-# Fighter walking animation variables
-fighter_walk_animation_cooldown = 100
-fighter_walk_animation_frame = 0
-
-last_update = pygame.time.get_ticks()
-
-for x in range(fighter_idle_animation_steps):
-    frame = fighter_idle_sprite_sheet.get_image(x, 128, 128, 1, BLACK)
-    fighter_idle_animation_list.append(frame)
-
-for x in range(fighter_walk_animation_steps):
-    walk_frame = fighter_walk_sprite_sheet.get_image(x, 128, 128, 1, BLACK)
-    fighter_walk_animation_list.append(walk_frame)
+# Create animations
+fighter_idle_animation = Animation(fighter_idle_sprite_sheet, 5, 128, 1, BLACK)
+fighter_walk_animation = Animation(fighter_walk_sprite_sheet, 8, 128, 1, BLACK)
 
 running = True
 moving = False
@@ -78,28 +57,18 @@ while running:
     else:
         moving = False
 
-    # Update animation
-    now = pygame.time.get_ticks()
+    # Get the current frame based on movement
     if moving:
-        if now - last_update >= fighter_walk_animation_cooldown:
-            last_update = now
-            fighter_walk_animation_frame += 1
-            if fighter_walk_animation_frame >= len(fighter_walk_animation_list):
-                fighter_walk_animation_frame = 0
-        frame = fighter_walk_animation_list[fighter_walk_animation_frame].convert_alpha()
+        frame = fighter_walk_animation.get_current_frame(100).convert_alpha()
     else:
-        if now - last_update >= fighter_idle_animation_cooldown:
-            last_update = now
-            fighter_idle_animation_frame += 1
-            if fighter_idle_animation_frame >= len(fighter_idle_animation_list):
-                fighter_idle_animation_frame = 0
-        frame = fighter_idle_animation_list[fighter_idle_animation_frame].convert_alpha()
+        frame = fighter_idle_animation.get_current_frame(100).convert_alpha()
 
     # Flip the frame if moving left
     if direction == "left":
         frame = pygame.transform.flip(frame, True, False)
 
     screen.blit(frame, (player_x, player_y))
+
     pygame.display.update()
 
 pygame.quit()
