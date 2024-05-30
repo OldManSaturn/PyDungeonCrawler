@@ -23,7 +23,7 @@ PyDungeonCrawler is a Python-based text-based game where players navigate throug
 
 2. Install the required dependencies:
 
-    ```shell
+    ```
     pip install -r requirements.txt
     ```
 
