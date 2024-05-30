@@ -8,10 +8,6 @@ PyDungeonCrawler is a Python-based text-based game where players navigate throug
 
 ## Features
 
-- Explore a procedurally generated dungeon
-- Engage in turn-based combat with various monsters
-- Collect powerful items and upgrades
-- Level up your character and improve your skills
 
 ## Installation
 
