@@ -15,41 +15,42 @@ pygame.display.set_caption("Dalton's Dungeon Crawling")
 clock = pygame.time.Clock()
 FPS = 60
 
-# Load spritesheets
-fighter_idle_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_idle.png").convert_alpha()
-fighter_walk_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_walk.png").convert_alpha()
-fighter_run_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_run.png").convert_alpha()
-fighter_jump_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_jump.png").convert_alpha()
-fighter_attack1_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_attack1.png").convert_alpha()
-fighter_attack2_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_attack2.png").convert_alpha()
-fighter_attack3_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_attack3.png").convert_alpha()
-fighter_block_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_block.png").convert_alpha()  # Blocking spritesheet
+# Function to load sprite sheets
+def load_sprite_sheet(file_name):
+    return pygame.image.load(file_name).convert_alpha()
 
-fighter_idle_sprite_sheet = SpriteSheet(fighter_idle_spritesheet_file_loaded)
-fighter_walk_sprite_sheet = SpriteSheet(fighter_walk_spritesheet_file_loaded)
-fighter_run_sprite_sheet = SpriteSheet(fighter_run_spritesheet_file_loaded)
-fighter_jump_sprite_sheet = SpriteSheet(fighter_jump_spritesheet_file_loaded)
-fighter_attack1_sprite_sheet = SpriteSheet(fighter_attack1_spritesheet_file_loaded)
-fighter_attack2_sprite_sheet = SpriteSheet(fighter_attack2_spritesheet_file_loaded)
-fighter_attack3_sprite_sheet = SpriteSheet(fighter_attack3_spritesheet_file_loaded)
-fighter_block_sprite_sheet = SpriteSheet(fighter_block_spritesheet_file_loaded)  # Blocking sprite sheet
+# Load all sprite sheets
+sprite_sheet_files = {
+    "idle": "assets/images/fighter_player_idle.png",
+    "walk": "assets/images/fighter_player_walk.png",
+    "run": "assets/images/fighter_player_run.png",
+    "jump": "assets/images/fighter_player_jump.png",
+    "attack1": "assets/images/fighter_player_attack1.png",
+    "attack2": "assets/images/fighter_player_attack2.png",
+    "attack3": "assets/images/fighter_player_attack3.png",
+    "block": "assets/images/fighter_player_block.png"
+}
+
+sprite_sheets = {name: SpriteSheet(load_sprite_sheet(file)) for name, file in sprite_sheet_files.items()}
 
 # Create animations
-fighter_idle_animation = Animation(fighter_idle_sprite_sheet, 5, 128, 1, BLACK)
-fighter_walk_animation = Animation(fighter_walk_sprite_sheet, 8, 128, 1, BLACK)
-fighter_run_animation = Animation(fighter_run_sprite_sheet, 8, 128, 1, BLACK)
-fighter_jump_animation = Animation(fighter_jump_sprite_sheet, 10, 128, 1, BLACK)
-fighter_attack1_animation = Animation(fighter_attack1_sprite_sheet, 4, 128, 1, BLACK)
-fighter_attack2_animation = Animation(fighter_attack2_sprite_sheet, 3, 128, 1, BLACK)
-fighter_attack3_animation = Animation(fighter_attack3_sprite_sheet, 4, 128, 1, BLACK)
-fighter_block_animation = Animation(fighter_block_sprite_sheet, 2, 128, 1, BLACK)  # Blocking animation
+animations = {
+    "idle": Animation(sprite_sheets["idle"], 5, 128, 1, BLACK),
+    "walk": Animation(sprite_sheets["walk"], 8, 128, 1, BLACK),
+    "run": Animation(sprite_sheets["run"], 8, 128, 1, BLACK),
+    "jump": Animation(sprite_sheets["jump"], 10, 128, 1, BLACK),
+    "attack1": Animation(sprite_sheets["attack1"], 4, 128, 1, BLACK),
+    "attack2": Animation(sprite_sheets["attack2"], 3, 128, 1, BLACK),
+    "attack3": Animation(sprite_sheets["attack3"], 4, 128, 1, BLACK),
+    "block": Animation(sprite_sheets["block"], 2, 128, 1, BLACK)
+}
 
 running = True
 moving = False
 direction = "right"
 jumping = False
 attacking = False
-blocking = False  # Blocking state
+blocking = False
 current_attack = None
 jump_speed = 15
 gravity = 1.5
@@ -77,19 +78,19 @@ while running:
             if not attacking:
                 if event.key == pygame.K_1:
                     attacking = True
-                    current_attack = fighter_attack1_animation
+                    current_attack = animations["attack1"]
                     current_attack.reset()
                 elif event.key == pygame.K_2:
                     attacking = True
-                    current_attack = fighter_attack2_animation
+                    current_attack = animations["attack2"]
                     current_attack.reset()
                 elif event.key == pygame.K_3:
                     attacking = True
-                    current_attack = fighter_attack3_animation
+                    current_attack = animations["attack3"]
                     current_attack.reset()
             if event.key == pygame.K_LALT or event.key == pygame.K_RALT:
                 blocking = True
-                fighter_block_animation.reset()  # Start blocking animation
+                animations["block"].reset()  # Start blocking animation
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LALT or event.key == pygame.K_RALT:
                 blocking = False
@@ -123,23 +124,23 @@ while running:
 
     # Get the current frame based on movement, jumping, attacking, and blocking
     if blocking:
-        frame = fighter_block_animation.get_current_frame(100).convert_alpha()
-        if fighter_block_animation.frame_index == len(fighter_block_animation.animation_list) - 1:
-            fighter_block_animation.frame_index = 1  # Hold the second frame
+        frame = animations["block"].get_current_frame(100).convert_alpha()
+        if animations["block"].frame_index == len(animations["block"].animation_list) - 1:
+            animations["block"].frame_index = 1  # Hold the second frame
     elif attacking:
         frame = current_attack.get_current_frame(100)
         if current_attack.frame_index == len(current_attack.animation_list) - 1:
             attacking = False
             current_attack = None
     elif jumping:
-        frame = fighter_jump_animation.get_current_frame(100).convert_alpha()
+        frame = animations["jump"].get_current_frame(100).convert_alpha()
     elif moving:
         if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
-            frame = fighter_run_animation.get_current_frame(100).convert_alpha()
+            frame = animations["run"].get_current_frame(100).convert_alpha()
         else:
-            frame = fighter_walk_animation.get_current_frame(100).convert_alpha()
+            frame = animations["walk"].get_current_frame(100).convert_alpha()
     else:
-        frame = fighter_idle_animation.get_current_frame(100).convert_alpha()
+        frame = animations["idle"].get_current_frame(100).convert_alpha()
 
     # Flip the frame if moving left
     if direction == "left":
