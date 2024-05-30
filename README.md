@@ -30,6 +30,4 @@ PyDungeonCrawler is a Python-based text-based game where players navigate throug
 ## Usage
 
 To start the game, run the following command:
-    ```shell
-    python main.py
-    ```
+
