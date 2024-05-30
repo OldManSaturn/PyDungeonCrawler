@@ -16,27 +16,38 @@ pygame.display.set_caption("Dalton's Dungeon Crawling")
 clock = pygame.time.Clock()
 FPS = 60
 
-#player = pygame.Rect((300,250,50,50))
-#player = Player("crimson", 500, 300)
+# Setup the sprites and animations for the player (currently only the fighter sprite is functional)
 
-# create sprite group
-#players = pygame.sprite.Group()
-#players.add(player)
-
-fighter_idle_spritesheet_file = pygame.image.load("assets/images/fighter_player_idle.png").convert_alpha()
-fighter_sprite_sheet = spritesheets.Spritesheet(fighter_idle_spritesheet_file)
+# Idle fighter sprite
+fighter_idle_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_idle.png").convert_alpha()
+fighter_idle_sprite_sheet = spritesheets.Spritesheet(fighter_idle_spritesheet_file_loaded)
+# Walking fighter sprite
+fighter_walk_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_walk.png").convert_alpha()
+fighter_walk_sprite_sheet = spritesheets.Spritesheet(fighter_walk_spritesheet_file_loaded)
 
 # create animation list for fighter sprite at idle
 fighter_idle_animation_list = []
 fighter_idle_animation_steps = 5
+# create animation list for fighter at walking
+fighter_walk_animation_list = []
+fighter_walk_animation_steps = 8
 
-last_update = pygame.time.get_ticks()
+# idle animation variables
 fighter_idle_animation_cooldown = 100
 fighter_idle_animation_frame = 0
+# fighter walking animation variables
+fighter_walk_animation_cooldown = 100
+fighter_walk_animation_frame = 0
+
+last_update = pygame.time.get_ticks()
 
 for x in range(fighter_idle_animation_steps):
-    frame = fighter_sprite_sheet.get_image(x, 128, 128, 1, BLACK)
+    frame = fighter_idle_sprite_sheet.get_image(x, 128, 128, 1, BLACK)
     fighter_idle_animation_list.append(frame)
+
+for x in range(fighter_walk_animation_steps):
+    walk_frame = fighter_walk_sprite_sheet.get_image(x, 128, 128, 1, BLACK)
+    fighter_walk_animation_list.append(walk_frame)
 
 running = True
 while running:
@@ -45,18 +56,21 @@ while running:
     # background update
     screen.fill(BACKGROUND)
 
-    # Update player animation
+    # Update idle player animation
     now = pygame.time.get_ticks()
     if now - last_update >= fighter_idle_animation_cooldown:
         last_update = now
         fighter_idle_animation_frame += 1
+        fighter_walk_animation_frame += 1
         if fighter_idle_animation_frame >= len(fighter_idle_animation_list):
             fighter_idle_animation_frame = 0
+        if fighter_walk_animation_frame >= len(fighter_walk_animation_list):
+            fighter_walk_animation_frame = 0
         
 
     # show frame image
     screen.blit(fighter_idle_animation_list[fighter_idle_animation_frame], (0,0))
-
+    screen.blit(fighter_walk_animation_list[fighter_walk_animation_frame], (128,0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
