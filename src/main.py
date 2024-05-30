@@ -18,21 +18,29 @@ FPS = 60
 # Load spritesheets
 fighter_idle_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_idle.png").convert_alpha()
 fighter_walk_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_walk.png").convert_alpha()
+fighter_jump_spritesheet_file_loaded = pygame.image.load("assets/images/fighter_player_jump.png").convert_alpha()
 
 fighter_idle_sprite_sheet = SpriteSheet(fighter_idle_spritesheet_file_loaded)
 fighter_walk_sprite_sheet = SpriteSheet(fighter_walk_spritesheet_file_loaded)
+fighter_jump_sprite_sheet = SpriteSheet(fighter_jump_spritesheet_file_loaded)
 
 # Create animations
 fighter_idle_animation = Animation(fighter_idle_sprite_sheet, 5, 128, 1, BLACK)
 fighter_walk_animation = Animation(fighter_walk_sprite_sheet, 8, 128, 1, BLACK)
+fighter_jump_animation = Animation(fighter_jump_sprite_sheet, 10, 128, 1, BLACK)
 
 running = True
 moving = False
 direction = "right"
+jumping = False
+jump_speed = 15
+gravity = 1
+velocity_y = 0
 
 # Starting position at the bottom left of the window
 player_x = 0
 player_y = SCREEN_HEIGHT - 128  # Assuming sprite height is 128 pixels
+ground_y = player_y
 
 while running:
     clock.tick(FPS)
@@ -44,6 +52,10 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and not jumping:
+                jumping = True
+                velocity_y = -jump_speed
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]:
@@ -57,8 +69,19 @@ while running:
     else:
         moving = False
 
-    # Get the current frame based on movement
-    if moving:
+    # Jumping logic
+    if jumping:
+        player_y += velocity_y
+        velocity_y += gravity
+        if player_y >= ground_y:
+            player_y = ground_y
+            jumping = False
+            velocity_y = 0
+
+    # Get the current frame based on movement and jumping
+    if jumping:
+        frame = fighter_jump_animation.get_current_frame(100).convert_alpha()
+    elif moving:
         frame = fighter_walk_animation.get_current_frame(100).convert_alpha()
     else:
         frame = fighter_idle_animation.get_current_frame(100).convert_alpha()
