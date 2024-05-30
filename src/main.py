@@ -23,29 +23,39 @@ FPS = 60
 #players = pygame.sprite.Group()
 #players.add(player)
 
-running = True
 fighter_idle_spritesheet_file = pygame.image.load("assets/images/fighter_player_idle.png").convert_alpha()
 fighter_sprite_sheet = spritesheets.Spritesheet(fighter_idle_spritesheet_file)
 
+# create animation list for fighter sprite at idle
+fighter_idle_animation_list = []
+fighter_idle_animation_steps = 5
 
-frame_0 = fighter_sprite_sheet.get_image(0, 128, 128, 1, BLACK)
-frame_1 = fighter_sprite_sheet.get_image(1, 128, 128, 1, BLACK)
-frame_2 = fighter_sprite_sheet.get_image(2, 128, 128, 1, BLACK)
-frame_3 = fighter_sprite_sheet.get_image(3, 128, 128, 1, BLACK)
-frame_4 = fighter_sprite_sheet.get_image(4, 128, 128, 1, BLACK)
-frame_5 = fighter_sprite_sheet.get_image(5, 128, 128, 1, BLACK)
+last_update = pygame.time.get_ticks()
+fighter_idle_animation_cooldown = 100
+fighter_idle_animation_frame = 0
 
+for x in range(fighter_idle_animation_steps):
+    frame = fighter_sprite_sheet.get_image(x, 128, 128, 1, BLACK)
+    fighter_idle_animation_list.append(frame)
+
+running = True
 while running:
     clock.tick(FPS)
 
     # background update
     screen.fill(BACKGROUND)
 
+    # Update player animation
+    now = pygame.time.get_ticks()
+    if now - last_update >= fighter_idle_animation_cooldown:
+        last_update = now
+        fighter_idle_animation_frame += 1
+        if fighter_idle_animation_frame >= len(fighter_idle_animation_list):
+            fighter_idle_animation_frame = 0
+        
+
     # show frame image
-    screen.blit(frame_0, (0,0))
-    screen.blit(frame_1, (100,0))
-    screen.blit(frame_2, (200,0))
-    screen.blit(frame_3, (300,0))
+    screen.blit(fighter_idle_animation_list[fighter_idle_animation_frame], (0,0))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
